@@ -2,7 +2,7 @@
 
 **AI_Ambu** is an AI-powered emergency assistant that helps citizens in **rural and urban India** request ambulances using voice or text. It auto-classifies emergencies, provides first aid, and dispatches help from the nearest hospital. Designed for fast response, low-tech regions, and language inclusivity (especially Hindi and tier-2/3 areas).
 
-🔗 **Website Agent Link:** [https://ai-ambu-buddy.vercel.app/](https://ai-ambu-buddy.vercel.app/)
+🔗 **Website Agent Link:** [https://v0-ai-ambu-website-creation.vercel.app/](https://v0-ai-ambu-website-creation.vercel.app/)
 
 ---
 
