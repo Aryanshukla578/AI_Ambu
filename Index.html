@@ -1,0 +1,1353 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI_Ambu - AI Ambulance System for Bharat</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary-teal: #14b8a6;
+            --secondary-teal: #0d9488;
+            --accent-cyan: #06b6d4;
+            --navy-blue: #1e293b;
+            --dark-navy: #0f172a;
+            --light-gray: #f8fafc;
+            --white: #ffffff;
+            --text-gray: #64748b;
+            --gradient-primary: linear-gradient(135deg, var(--primary-teal) 0%, var(--accent-cyan) 50%, var(--navy-blue) 100%);
+            --gradient-secondary: linear-gradient(45deg, #667eea 0%, #764ba2 100%);
+            --gradient-glow: linear-gradient(135deg, rgba(20, 184, 166, 0.3) 0%, rgba(6, 182, 212, 0.3) 100%);
+            --shadow-glow: 0 0 40px rgba(20, 184, 166, 0.3);
+            --shadow-intense: 0 20px 60px rgba(0, 0, 0, 0.3);
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            line-height: 1.6;
+            color: var(--navy-blue);
+            overflow-x: hidden;
+            background: var(--white);
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        /* Creative Loading Animation */
+        .loading-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--gradient-primary);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            transition: opacity 0.5s ease;
+        }
+
+        .loading-content {
+            text-align: center;
+            color: white;
+        }
+
+        .loading-logo {
+            font-family: 'Orbitron', monospace;
+            font-size: 3rem;
+            font-weight: 900;
+            margin-bottom: 2rem;
+            animation: pulse 2s infinite;
+        }
+
+        .loading-spinner {
+            width: 60px;
+            height: 60px;
+            border: 4px solid rgba(255, 255, 255, 0.3);
+            border-top: 4px solid white;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.05); opacity: 0.8; }
+        }
+
+        /* Enhanced Header */
+        header {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            z-index: 1000;
+            padding: 1rem 0;
+            transition: all 0.3s ease;
+            border-bottom: 1px solid rgba(20, 184, 166, 0.1);
+        }
+
+        header.scrolled {
+            background: rgba(255, 255, 255, 0.98);
+            box-shadow: var(--shadow-glow);
+        }
+
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-family: 'Orbitron', monospace;
+            font-size: 1.8rem;
+            font-weight: 900;
+            background: var(--gradient-primary);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            position: relative;
+        }
+
+        .logo::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background: var(--gradient-primary);
+            transform: scaleX(0);
+            transition: transform 0.3s ease;
+        }
+
+        .logo:hover::after {
+            transform: scaleX(1);
+        }
+
+        .nav-links {
+            display: flex;
+            list-style: none;
+            gap: 2rem;
+        }
+
+        .nav-links a {
+            text-decoration: none;
+            color: var(--navy-blue);
+            font-weight: 500;
+            position: relative;
+            transition: all 0.3s ease;
+            padding: 0.5rem 1rem;
+            border-radius: 25px;
+        }
+
+        .nav-links a::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--gradient-glow);
+            border-radius: 25px;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            z-index: -1;
+        }
+
+        .nav-links a:hover::before {
+            opacity: 1;
+        }
+
+        .nav-links a:hover {
+            color: var(--primary-teal);
+            transform: translateY(-2px);
+        }
+
+        .auth-buttons {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .btn-login, .btn-signup {
+            padding: 0.5rem 1.5rem;
+            border-radius: 25px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn-login {
+            color: var(--primary-teal);
+            border: 2px solid var(--primary-teal);
+            background: transparent;
+        }
+
+        .btn-signup {
+            background: var(--gradient-primary);
+            color: white;
+            border: 2px solid transparent;
+            box-shadow: var(--shadow-glow);
+        }
+
+        .btn-login:hover, .btn-signup:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-intense);
+        }
+
+        /* Creative Hero Section */
+        .hero {
+            background: var(--gradient-primary);
+            color: var(--white);
+            padding: 140px 0 100px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: 
+                radial-gradient(circle at 20% 80%, rgba(255, 255, 255, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, rgba(255, 255, 255, 0.1) 0%, transparent 50%);
+        }
+
+        .hero-particles {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+        }
+
+        .particle {
+            position: absolute;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            animation: float 6s ease-in-out infinite;
+        }
+
+        .particle:nth-child(1) { width: 10px; height: 10px; left: 10%; animation-delay: 0s; }
+        .particle:nth-child(2) { width: 15px; height: 15px; left: 20%; animation-delay: 1s; }
+        .particle:nth-child(3) { width: 8px; height: 8px; left: 30%; animation-delay: 2s; }
+        .particle:nth-child(4) { width: 12px; height: 12px; left: 40%; animation-delay: 3s; }
+        .particle:nth-child(5) { width: 18px; height: 18px; left: 50%; animation-delay: 4s; }
+        .particle:nth-child(6) { width: 6px; height: 6px; left: 60%; animation-delay: 5s; }
+        .particle:nth-child(7) { width: 14px; height: 14px; left: 70%; animation-delay: 0.5s; }
+        .particle:nth-child(8) { width: 9px; height: 9px; left: 80%; animation-delay: 1.5s; }
+        .particle:nth-child(9) { width: 16px; height: 16px; left: 90%; animation-delay: 2.5s; }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(100vh) rotate(0deg); opacity: 0; }
+            10% { opacity: 1; }
+            90% { opacity: 1; }
+            100% { transform: translateY(-100px) rotate(360deg); opacity: 0; }
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 2;
+        }
+
+        .hero h1 {
+            font-family: 'Orbitron', monospace;
+            font-size: 4rem;
+            font-weight: 900;
+            margin-bottom: 1rem;
+            animation: fadeInUp 1s ease;
+            text-shadow: 0 0 30px rgba(255, 255, 255, 0.5);
+        }
+
+        .hero .subtitle {
+            font-size: 1.4rem;
+            margin-bottom: 2rem;
+            opacity: 0.95;
+            animation: fadeInUp 1s ease 0.2s both;
+            font-weight: 300;
+        }
+
+        .hero-cta {
+            display: flex;
+            gap: 1.5rem;
+            justify-content: center;
+            flex-wrap: wrap;
+            animation: fadeInUp 1s ease 0.4s both;
+        }
+
+        .cta-button {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: var(--white);
+            color: var(--primary-teal);
+            padding: 18px 35px;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: 700;
+            font-size: 1.1rem;
+            transition: all 0.4s ease;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .cta-button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: var(--gradient-primary);
+            transition: left 0.4s ease;
+            z-index: -1;
+        }
+
+        .cta-button:hover::before {
+            left: 0;
+        }
+
+        .cta-button:hover {
+            color: white;
+            transform: translateY(-5px);
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.3);
+        }
+
+        .cta-secondary {
+            background: transparent;
+            color: white;
+            border: 2px solid white;
+        }
+
+        .cta-secondary::before {
+            background: white;
+        }
+
+        .cta-secondary:hover {
+            color: var(--primary-teal);
+        }
+
+        /* Enhanced Sections */
+        .section {
+            padding: 100px 0;
+            position: relative;
+        }
+
+        .section-title {
+            text-align: center;
+            font-size: 3rem;
+            font-weight: 800;
+            margin-bottom: 1rem;
+            color: var(--navy-blue);
+            position: relative;
+        }
+
+        .section-title::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80px;
+            height: 4px;
+            background: var(--gradient-primary);
+            border-radius: 2px;
+        }
+
+        .section-subtitle {
+            text-align: center;
+            font-size: 1.2rem;
+            color: var(--text-gray);
+            margin-bottom: 4rem;
+            max-width: 700px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        /* Creative Problem Cards */
+        .problem-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 2rem;
+            margin-top: 4rem;
+        }
+
+        .problem-item {
+            background: var(--white);
+            padding: 2.5rem;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            transition: all 0.4s ease;
+            border: 1px solid rgba(20, 184, 166, 0.1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .problem-item::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: var(--gradient-primary);
+        }
+
+        .problem-item::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 4px;
+            height: 100%;
+            background: var(--gradient-primary);
+            transform: scaleY(0);
+            transition: transform 0.4s ease;
+        }
+
+        .problem-item:hover::after {
+            transform: scaleY(1);
+        }
+
+        .problem-item:hover {
+            transform: translateY(-10px);
+            box-shadow: var(--shadow-intense);
+        }
+
+        .problem-item i {
+            font-size: 2.5rem;
+            background: var(--gradient-primary);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 1.5rem;
+            display: block;
+        }
+
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 10000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(10px);
+        }
+
+        .modal-content {
+            background: white;
+            margin: 5% auto;
+            padding: 0;
+            border-radius: 20px;
+            width: 90%;
+            max-width: 500px;
+            position: relative;
+            overflow: hidden;
+            box-shadow: var(--shadow-intense);
+            animation: modalSlideIn 0.4s ease;
+        }
+
+        @keyframes modalSlideIn {
+            from { transform: translateY(-50px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        .modal-header {
+            background: var(--gradient-primary);
+            color: white;
+            padding: 2rem;
+            text-align: center;
+            position: relative;
+        }
+
+        .modal-header h2 {
+            font-family: 'Orbitron', monospace;
+            font-size: 1.8rem;
+            font-weight: 700;
+        }
+
+        .close {
+            position: absolute;
+            right: 1rem;
+            top: 1rem;
+            color: white;
+            font-size: 2rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .close:hover {
+            transform: rotate(90deg);
+        }
+
+        .modal-body {
+            padding: 2rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            color: var(--navy-blue);
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e2e8f0;
+            border-radius: 10px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            background: #f8fafc;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: var(--primary-teal);
+            background: white;
+            box-shadow: 0 0 0 3px rgba(20, 184, 166, 0.1);
+        }
+
+        .form-submit {
+            width: 100%;
+            background: var(--gradient-primary);
+            color: white;
+            padding: 15px;
+            border: none;
+            border-radius: 10px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .form-submit:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-glow);
+        }
+
+        /* Enhanced Solution Cards */
+        .solution-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-top: 4rem;
+        }
+
+        .solution-card {
+            background: var(--white);
+            padding: 3rem 2rem;
+            border-radius: 25px;
+            text-align: center;
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.1);
+            transition: all 0.4s ease;
+            position: relative;
+            overflow: hidden;
+            border: 1px solid rgba(20, 184, 166, 0.1);
+        }
+
+        .solution-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: var(--gradient-primary);
+        }
+
+        .solution-card::after {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: var(--gradient-glow);
+            opacity: 0;
+            transition: opacity 0.4s ease;
+            z-index: -1;
+        }
+
+        .solution-card:hover::after {
+            opacity: 1;
+        }
+
+        .solution-card:hover {
+            transform: translateY(-15px) scale(1.02);
+            box-shadow: var(--shadow-intense);
+        }
+
+        .solution-card i {
+            font-size: 3.5rem;
+            background: var(--gradient-primary);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 1.5rem;
+            display: block;
+        }
+
+        /* Team Section */
+        .team-section {
+            background: var(--light-gray);
+        }
+
+        .team-card {
+            background: white;
+            padding: 2rem;
+            border-radius: 20px;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+            max-width: 400px;
+            margin: 0 auto;
+        }
+
+        .team-card:hover {
+            transform: translateY(-10px);
+            box-shadow: var(--shadow-intense);
+        }
+
+        .team-avatar {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            background: var(--gradient-primary);
+            margin: 0 auto 1.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3rem;
+            color: white;
+            font-weight: bold;
+        }
+
+        .team-name {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--navy-blue);
+            margin-bottom: 0.5rem;
+        }
+
+        .team-role {
+            color: var(--primary-teal);
+            font-weight: 600;
+            margin-bottom: 1rem;
+        }
+
+        .team-contact {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            color: var(--text-gray);
+            margin-bottom: 0.5rem;
+        }
+
+        /* Enhanced Impact Section */
+        .impact-section {
+            background: var(--gradient-primary);
+            color: var(--white);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .impact-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: 
+                radial-gradient(circle at 30% 70%, rgba(255, 255, 255, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 70% 30%, rgba(255, 255, 255, 0.1) 0%, transparent 50%);
+        }
+
+        .impact-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 3rem;
+            margin-top: 4rem;
+            position: relative;
+            z-index: 2;
+        }
+
+        .impact-item {
+            text-align: center;
+            padding: 2rem;
+            border-radius: 20px;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+        }
+
+        .impact-item:hover {
+            transform: translateY(-10px);
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .impact-number {
+            font-size: 4rem;
+            font-weight: 900;
+            margin-bottom: 0.5rem;
+            color: var(--white);
+            text-shadow: 0 0 20px rgba(255, 255, 255, 0.5);
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .nav-links {
+                display: none;
+            }
+
+            .auth-buttons {
+                gap: 0.5rem;
+            }
+
+            .btn-login, .btn-signup {
+                padding: 0.4rem 1rem;
+                font-size: 0.9rem;
+            }
+
+            .hero h1 {
+                font-size: 2.5rem;
+            }
+
+            .hero .subtitle {
+                font-size: 1.1rem;
+            }
+
+            .hero-cta {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .section-title {
+                font-size: 2rem;
+            }
+
+            .problem-list,
+            .solution-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .modal-content {
+                width: 95%;
+                margin: 10% auto;
+            }
+        }
+
+        /* Additional Creative Animations */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes slideInLeft {
+            from {
+                opacity: 0;
+                transform: translateX(-50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        @keyframes slideInRight {
+            from {
+                opacity: 0;
+                transform: translateX(50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .slide-in-left {
+            animation: slideInLeft 0.8s ease;
+        }
+
+        .slide-in-right {
+            animation: slideInRight 0.8s ease;
+        }
+    </style>
+</head>
+<body>
+    <!-- Loading Screen -->
+    <div class="loading-screen" id="loadingScreen">
+        <div class="loading-content">
+            <div class="loading-logo">AI_Ambu</div>
+            <div class="loading-spinner"></div>
+        </div>
+    </div>
+
+    <!-- Header -->
+    <header id="header">
+        <nav class="container">
+            <div class="logo">AI_Ambu</div>
+            <ul class="nav-links">
+                <li><a href="#home">Home</a></li>
+                <li><a href="#problem">Problem</a></li>
+                <li><a href="#solution">Solution</a></li>
+                <li><a href="#features">Features</a></li>
+                <li><a href="#team">Team</a></li>
+                <li><a href="#impact">Impact</a></li>
+            </ul>
+            <div class="auth-buttons">
+                <a href="#" class="btn-login" onclick="openModal('loginModal')">
+                    <i class="fas fa-sign-in-alt"></i> Login
+                </a>
+                <a href="#" class="btn-signup" onclick="openModal('signupModal')">
+                    <i class="fas fa-user-plus"></i> Sign Up
+                </a>
+            </div>
+        </nav>
+    </header>
+
+    <!-- Login Modal -->
+    <div id="loginModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2><i class="fas fa-sign-in-alt"></i> Welcome Back</h2>
+                <span class="close" onclick="closeModal('loginModal')">&times;</span>
+            </div>
+            <div class="modal-body">
+                <form id="loginForm">
+                    <div class="form-group">
+                        <label for="loginEmail">Email Address</label>
+                        <input type="email" id="loginEmail" name="email" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="loginPassword">Password</label>
+                        <input type="password" id="loginPassword" name="password" required>
+                    </div>
+                    <button type="submit" class="form-submit">
+                        <i class="fas fa-sign-in-alt"></i> Login to AI_Ambu
+                    </button>
+                </form>
+                <p style="text-align: center; margin-top: 1rem; color: var(--text-gray);">
+                    Don't have an account? <a href="#" onclick="closeModal('loginModal'); openModal('signupModal')" style="color: var(--primary-teal); text-decoration: none;">Sign up here</a>
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Signup Modal -->
+    <div id="signupModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2><i class="fas fa-user-plus"></i> Join AI_Ambu</h2>
+                <span class="close" onclick="closeModal('signupModal')">&times;</span>
+            </div>
+            <div class="modal-body">
+                <form id="signupForm">
+                    <div class="form-group">
+                        <label for="signupName">Full Name</label>
+                        <input type="text" id="signupName" name="name" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="signupEmail">Email Address</label>
+                        <input type="email" id="signupEmail" name="email" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="signupPhone">Phone Number</label>
+                        <input type="tel" id="signupPhone" name="phone" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="signupRole">Role</label>
+                        <select id="signupRole" name="role" style="width: 100%; padding: 12px 15px; border: 2px solid #e2e8f0; border-radius: 10px; font-size: 1rem; background: #f8fafc;">
+                            <option value="">Select your role</option>
+                            <option value="citizen">Citizen</option>
+                            <option value="medical">Medical Professional</option>
+                            <option value="dispatcher">Emergency Dispatcher</option>
+                            <option value="admin">System Administrator</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="signupPassword">Password</label>
+                        <input type="password" id="signupPassword" name="password" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="signupConfirmPassword">Confirm Password</label>
+                        <input type="password" id="signupConfirmPassword" name="confirmPassword" required>
+                    </div>
+                    <button type="submit" class="form-submit">
+                        <i class="fas fa-user-plus"></i> Create Account
+                    </button>
+                </form>
+                <p style="text-align: center; margin-top: 1rem; color: var(--text-gray);">
+                    Already have an account? <a href="#" onclick="closeModal('signupModal'); openModal('loginModal')" style="color: var(--primary-teal); text-decoration: none;">Login here</a>
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Hero Section -->
+    <section id="home" class="hero">
+        <div class="hero-particles">
+            <div class="particle"></div>
+            <div class="particle"></div>
+            <div class="particle"></div>
+            <div class="particle"></div>
+            <div class="particle"></div>
+            <div class="particle"></div>
+            <div class="particle"></div>
+            <div class="particle"></div>
+            <div class="particle"></div>
+        </div>
+        <div class="container">
+            <div class="hero-content">
+                <h1 data-aos="fade-up">AI_Ambu</h1>
+                <p class="subtitle" data-aos="fade-up" data-aos-delay="200">
+                    Revolutionizing Emergency Response with AI-Powered Ambulance System for Bharat
+                </p>
+                <div class="hero-cta" data-aos="fade-up" data-aos-delay="400">
+                    <a href="#contact" class="cta-button">
+                        <i class="fas fa-comments"></i> Talk to Agent
+                    </a>
+                    <a href="#solution" class="cta-button cta-secondary">
+                        <i class="fas fa-play"></i> Watch Demo
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Problem Statement -->
+    <section id="problem" class="section">
+        <div class="container">
+            <h2 class="section-title" data-aos="fade-up">The Emergency Response Crisis</h2>
+            <p class="section-subtitle" data-aos="fade-up" data-aos-delay="100">
+                India faces critical challenges in emergency medical response that cost precious lives every day
+            </p>
+            <div class="problem-list">
+                <div class="problem-item" data-aos="fade-up" data-aos-delay="200">
+                    <i class="fas fa-clock"></i>
+                    <h3>Delayed Response Times</h3>
+                    <p>Average ambulance response time of 20-30 minutes in urban areas, even longer in rural regions</p>
+                </div>
+                <div class="problem-item" data-aos="fade-up" data-aos-delay="300">
+                    <i class="fas fa-map-marked-alt"></i>
+                    <h3>Poor Location Tracking</h3>
+                    <p>Difficulty in locating exact emergency locations, especially in areas with unclear addresses</p>
+                </div>
+                <div class="problem-item" data-aos="fade-up" data-aos-delay="400">
+                    <i class="fas fa-phone-slash"></i>
+                    <h3>Communication Gaps</h3>
+                    <p>Lack of real-time communication between patients, dispatchers, and medical teams</p>
+                </div>
+                <div class="problem-item" data-aos="fade-up" data-aos-delay="500">
+                    <i class="fas fa-hospital"></i>
+                    <h3>Hospital Coordination</h3>
+                    <p>No real-time visibility of hospital bed availability and specialized care facilities</p>
+                </div>
+                <div class="problem-item" data-aos="fade-up" data-aos-delay="600">
+                    <i class="fas fa-chart-line"></i>
+                    <h3>Lack of Analytics</h3>
+                    <p>No data-driven insights to optimize emergency response and resource allocation</p>
+                </div>
+                <div class="problem-item" data-aos="fade-up" data-aos-delay="700">
+                    <i class="fas fa-language"></i>
+                    <h3>Language Barriers</h3>
+                    <p>Communication challenges across India's diverse linguistic landscape during emergencies</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Solution -->
+    <section id="solution" class="section" style="background: var(--light-gray);">
+        <div class="container">
+            <h2 class="section-title" data-aos="fade-up">Our AI-Powered Solution</h2>
+            <p class="section-subtitle" data-aos="fade-up" data-aos-delay="100">
+                AI_Ambu leverages cutting-edge artificial intelligence to transform emergency medical response
+            </p>
+            <div class="solution-grid">
+                <div class="solution-card" data-aos="fade-up" data-aos-delay="200">
+                    <i class="fas fa-brain"></i>
+                    <h3>Intelligent Dispatch</h3>
+                    <p>AI algorithms optimize ambulance allocation based on location, traffic, and emergency severity</p>
+                </div>
+                <div class="solution-card" data-aos="fade-up" data-aos-delay="300">
+                    <i class="fas fa-satellite-dish"></i>
+                    <h3>Real-time Tracking</h3>
+                    <p>GPS-enabled live tracking with predictive routing to minimize response times</p>
+                </div>
+                <div class="solution-card" data-aos="fade-up" data-aos-delay="400">
+                    <i class="fas fa-comments"></i>
+                    <h3>Multi-language Support</h3>
+                    <p>AI-powered voice recognition and translation for seamless communication across languages</p>
+                </div>
+                <div class="solution-card" data-aos="fade-up" data-aos-delay="500">
+                    <i class="fas fa-network-wired"></i>
+                    <h3>Hospital Integration</h3>
+                    <p>Real-time hospital capacity monitoring and automatic bed reservation system</p>
+                </div>
+                <div class="solution-card" data-aos="fade-up" data-aos-delay="600">
+                    <i class="fas fa-chart-bar"></i>
+                    <h3>Predictive Analytics</h3>
+                    <p>Data-driven insights for resource planning and emergency response optimization</p>
+                </div>
+                <div class="solution-card" data-aos="fade-up" data-aos-delay="700">
+                    <i class="fas fa-mobile-alt"></i>
+                    <h3>User-Friendly Apps</h3>
+                    <p>Intuitive mobile applications for citizens, dispatchers, and ambulance crews</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- MVP Features -->
+    <section id="features" class="section">
+        <div class="container">
+            <h2 class="section-title" data-aos="fade-up">Key Features</h2>
+            <p class="section-subtitle" data-aos="fade-up" data-aos-delay="100">
+                Our comprehensive ecosystem includes four core components working in perfect harmony
+            </p>
+            <div class="solution-grid">
+                <div class="solution-card" data-aos="fade-up" data-aos-delay="200">
+                    <i class="fas fa-mobile-alt"></i>
+                    <h3>Public Emergency App</h3>
+                    <p>One-tap emergency calling with automatic location sharing and real-time ambulance tracking</p>
+                </div>
+                <div class="solution-card" data-aos="fade-up" data-aos-delay="300">
+                    <i class="fas fa-robot"></i>
+                    <h3>AI Dispatcher System</h3>
+                    <p>Intelligent call routing, resource optimization, and automated emergency response coordination</p>
+                </div>
+                <div class="solution-card" data-aos="fade-up" data-aos-delay="400">
+                    <i class="fas fa-ambulance"></i>
+                    <h3>Ambulance Crew App</h3>
+                    <p>Navigation assistance, patient information access, and hospital communication tools</p>
+                </div>
+                <div class="solution-card" data-aos="fade-up" data-aos-delay="500">
+                    <i class="fas fa-analytics"></i>
+                    <h3>Analytics Dashboard</h3>
+                    <p>Real-time monitoring, performance metrics, and predictive insights for system optimization</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Team Section -->
+    <section id="team" class="section team-section">
+        <div class="container">
+            <h2 class="section-title" data-aos="fade-up">Meet Our Founder</h2>
+            <p class="section-subtitle" data-aos="fade-up" data-aos-delay="100">
+                Passionate about revolutionizing emergency healthcare through technology
+            </p>
+            <div class="team-card" data-aos="fade-up" data-aos-delay="200">
+                <div class="team-avatar">AS</div>
+                <div class="team-name">Aryan Shukla</div>
+                <div class="team-role">Founder & CEO</div>
+                <div class="team-contact">
+                    <i class="fas fa-phone"></i>
+                    <span>+91 7068378758</span>
+                </div>
+                <div class="team-contact">
+                    <i class="fas fa-envelope"></i>
+                    <span>aryan@aiambu.in</span>
+                </div>
+                <p style="color: var(--text-gray); margin-top: 1rem; line-height: 1.6;">
+                    Visionary entrepreneur dedicated to transforming emergency medical response in India through innovative AI solutions and cutting-edge technology.
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Impact Numbers -->
+    <section id="impact" class="section impact-section">
+        <div class="container">
+            <h2 class="section-title" data-aos="fade-up" style="color: white;">Projected Impact</h2>
+            <p class="section-subtitle" data-aos="fade-up" data-aos-delay="100" style="color: rgba(255,255,255,0.9);">
+                Our AI-powered system is designed to save lives and transform emergency response across India
+            </p>
+            <div class="impact-grid">
+                <div class="impact-item" data-aos="fade-up" data-aos-delay="200">
+                    <div class="impact-number">30%</div>
+                    <div class="impact-label">Reduced Response Time</div>
+                </div>
+                <div class="impact-item" data-aos="fade-up" data-aos-delay="300">
+                    <div class="impact-number">45%</div>
+                    <div class="impact-label">Improved Survival Rates</div>
+                </div>
+                <div class="impact-item" data-aos="fade-up" data-aos-delay="400">
+                    <div class="impact-number">60%</div>
+                    <div class="impact-label">Better Resource Utilization</div>
+                </div>
+                <div class="impact-item" data-aos="fade-up" data-aos-delay="500">
+                    <div class="impact-number">24/7</div>
+                    <div class="impact-label">AI-Powered Availability</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Call to Action -->
+    <section id="cta" class="section" style="background: var(--navy-blue); color: white;">
+        <div class="container" style="text-align: center;">
+            <h2 data-aos="fade-up" style="color: white; font-size: 2.5rem; margin-bottom: 1rem;">Join the Movement</h2>
+            <p data-aos="fade-up" data-aos-delay="100" style="font-size: 1.2rem; margin-bottom: 2rem; opacity: 0.9;">
+                Help us transform emergency response and save lives across Bharat with AI_Ambu
+            </p>
+            <div style="display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;" data-aos="fade-up" data-aos-delay="200">
+                <a href="#" onclick="openModal('signupModal')" class="cta-button">
+                    <i class="fas fa-rocket"></i> Get Started
+                </a>
+                <a href="#contact" class="cta-button cta-secondary">
+                    <i class="fas fa-info-circle"></i> Learn More
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer id="contact" style="background: var(--dark-navy); color: white; padding: 3rem 0 1rem;">
+        <div class="container">
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 2rem; margin-bottom: 2rem;">
+                <div>
+                    <h3 style="font-family: 'Orbitron', monospace; font-size: 1.5rem; color: var(--primary-teal); margin-bottom: 1rem;">AI_Ambu</h3>
+                    <p style="color: rgba(255, 255, 255, 0.8); margin-bottom: 1rem;">Revolutionizing emergency medical response with artificial intelligence for a safer Bharat.</p>
+                    <div style="display: flex; gap: 1rem;">
+                        <a href="#" style="display: inline-block; width: 40px; height: 40px; background: var(--primary-teal); color: white; text-align: center; line-height: 40px; border-radius: 50%; transition: all 0.3s ease;"><i class="fab fa-twitter"></i></a>
+                        <a href="#" style="display: inline-block; width: 40px; height: 40px; background: var(--primary-teal); color: white; text-align: center; line-height: 40px; border-radius: 50%; transition: all 0.3s ease;"><i class="fab fa-linkedin"></i></a>
+                        <a href="#" style="display: inline-block; width: 40px; height: 40px; background: var(--primary-teal); color: white; text-align: center; line-height: 40px; border-radius: 50%; transition: all 0.3s ease;"><i class="fab fa-github"></i></a>
+                        <a href="#" style="display: inline-block; width: 40px; height: 40px; background: var(--primary-teal); color: white; text-align: center; line-height: 40px; border-radius: 50%; transition: all 0.3s ease;"><i class="fab fa-instagram"></i></a>
+                    </div>
+                </div>
+                <div>
+                    <h3 style="color: var(--primary-teal); margin-bottom: 1rem;">Contact Founder</h3>
+                    <p style="color: rgba(255, 255, 255, 0.8); margin-bottom: 0.5rem;"><i class="fas fa-user"></i> Aryan Shukla</p>
+                    <p style="color: rgba(255, 255, 255, 0.8); margin-bottom: 0.5rem;"><i class="fas fa-envelope"></i> aryan@aiambu.in</p>
+                    <p style="color: rgba(255, 255, 255, 0.8); margin-bottom: 0.5rem;"><i class="fas fa-phone"></i> +91 7068378758</p>
+                    <p style="color: rgba(255, 255, 255, 0.8);"><i class="fas fa-map-marker-alt"></i> Bangalore, Karnataka, India</p>
+                </div>
+                <div>
+                    <h3 style="color: var(--primary-teal); margin-bottom: 1rem;">Quick Links</h3>
+                    <a href="#problem" style="color: rgba(255, 255, 255, 0.8); text-decoration: none; display: block; margin-bottom: 0.5rem;">Problem Statement</a>
+                    <a href="#solution" style="color: rgba(255, 255, 255, 0.8); text-decoration: none; display: block; margin-bottom: 0.5rem;">Our Solution</a>
+                    <a href="#features" style="color: rgba(255, 255, 255, 0.8); text-decoration: none; display: block; margin-bottom: 0.5rem;">Features</a>
+                    <a href="#impact" style="color: rgba(255, 255, 255, 0.8); text-decoration: none; display: block;">Impact</a>
+                </div>
+                <div>
+                    <h3 style="color: var(--primary-teal); margin-bottom: 1rem;">Resources</h3>
+                    <a href="#" style="color: rgba(255, 255, 255, 0.8); text-decoration: none; display: block; margin-bottom: 0.5rem;">Documentation</a>
+                    <a href="#" style="color: rgba(255, 255, 255, 0.8); text-decoration: none; display: block; margin-bottom: 0.5rem;">API Reference</a>
+                    <a href="#" style="color: rgba(255, 255, 255, 0.8); text-decoration: none; display: block; margin-bottom: 0.5rem;">Support</a>
+                    <a href="#" style="color: rgba(255, 255, 255, 0.8); text-decoration: none; display: block;">Privacy Policy</a>
+                </div>
+            </div>
+            <div style="border-top: 1px solid rgba(255, 255, 255, 0.1); padding-top: 1rem; text-align: center; color: rgba(255, 255, 255, 0.6);">
+                <p>&copy; 2024 AI_Ambu. All rights reserved. Made with ❤ for Bharat by Aryan Shukla.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    <script id="omnidimension-web-widget" async src="https://backend.omnidim.io/web_widget.js?secret_key=834041f73f4f5372a4ff0c56234314a6"></script>
+    <script>
+        // Loading Screen
+        window.addEventListener('load', function() {
+            setTimeout(() => {
+                document.getElementById('loadingScreen').style.opacity = '0';
+                setTimeout(() => {
+                    document.getElementById('loadingScreen').style.display = 'none';
+                }, 500);
+            }, 2000);
+        });
+
+        // Initialize AOS
+        AOS.init({
+            duration: 800,
+            easing: 'ease-in-out',
+            once: true,
+            offset: 100
+        });
+
+        // Modal Functions
+        function openModal(modalId) {
+            document.getElementById(modalId).style.display = 'block';
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeModal(modalId) {
+            document.getElementById(modalId).style.display = 'none';
+            document.body.style.overflow = 'auto';
+        }
+
+        // Close modal when clicking outside
+        window.onclick = function(event) {
+            const modals = document.querySelectorAll('.modal');
+            modals.forEach(modal => {
+                if (event.target === modal) {
+                    modal.style.display = 'none';
+                    document.body.style.overflow = 'auto';
+                }
+            });
+        }
+
+        // Form Submissions
+        document.getElementById('loginForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const email = document.getElementById('loginEmail').value;
+            const password = document.getElementById('loginPassword').value;
+            
+            // Simulate login process
+            alert(Welcome back! Logging in with email: ${email});
+            closeModal('loginModal');
+        });
+
+        document.getElementById('signupForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const name = document.getElementById('signupName').value;
+            const email = document.getElementById('signupEmail').value;
+            const phone = document.getElementById('signupPhone').value;
+            const role = document.getElementById('signupRole').value;
+            const password = document.getElementById('signupPassword').value;
+            const confirmPassword = document.getElementById('signupConfirmPassword').value;
+            
+            if (password !== confirmPassword) {
+                alert('Passwords do not match!');
+                return;
+            }
+            
+            // Simulate signup process
+            alert(Welcome to AI_Ambu, ${name}! Your account has been created successfully.);
+            closeModal('signupModal');
+        });
+
+        // Smooth scrolling
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+
+        // Header scroll effect
+        window.addEventListener('scroll', function() {
+            const header = document.getElementById('header');
+            if (window.scrollY > 100) {
+                header.classList.add('scrolled');
+            } else {
+                header.classList.remove('scrolled');
+            }
+        });
+
+        // Counter animation for impact numbers
+        function animateCounters() {
+            const counters = document.querySelectorAll('.impact-number');
+            counters.forEach(counter => {
+                const target = parseInt(counter.textContent);
+                const increment = target / 100;
+                let current = 0;
+                
+                const timer = setInterval(() => {
+                    current += increment;
+                    if (current >= target) {
+                        counter.textContent = target + (counter.textContent.includes('%') ? '%' : '');
+                        clearInterval(timer);
+                    } else {
+                        counter.textContent = Math.floor(current) + (counter.textContent.includes('%') ? '%' : '');
+                    }
+                }, 20);
+            });
+        }
+
+        // Trigger counter animation when impact section is visible
+        const impactSection = document.querySelector('.impact-section');
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    animateCounters();
+                    observer.unobserve(entry.target);
+                }
+            });
+        });
+
+        observer.observe(impactSection);
+
+        // Parallax effect for hero particles
+        window.addEventListener('scroll', function() {
+            const scrolled = window.pageYOffset;
+            const particles = document.querySelectorAll('.particle');
+            particles.forEach((particle, index) => {
+                const speed = (index + 1) * 0.5;
+                particle.style.transform = translateY(${scrolled * speed}px);
+            });
+        });
+
+        // Dynamic greeting based on time
+        function updateGreeting() {
+            const hour = new Date().getHours();
+            let greeting = 'Welcome to';
+            
+            if (hour < 12) greeting = 'Good Morning! Welcome to';
+            else if (hour < 17) greeting = 'Good Afternoon! Welcome to';
+            else greeting = 'Good Evening! Welcome to';
+            
+            // You can use this greeting in modals or other dynamic content
+        }
+
+        updateGreeting();
+    </script>
+</body>
+</html>
